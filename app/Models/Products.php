@@ -52,4 +52,9 @@ class Products extends Model
     {
         return ProductsFactory::new();
     }
+
+    public static function findById($id)
+    {
+        return static::withTrashed()->find($id);
+    }
 }

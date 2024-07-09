@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\MaxDateDifference;
-use App\Traits\HttpResponses;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -37,6 +35,6 @@ class OrderListRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException($this->error($validator->errors()->toArray(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY, 'Lütfen alanları kontrol ediniz!'));
+        throw new HttpResponseException(response()->json(['error' => 'Gerekli Alanları Doldurunuz!'], 422));
     }
 }

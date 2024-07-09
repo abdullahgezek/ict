@@ -3,13 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderListRequest;
-use App\Http\Resources\OrderListResource;
+use App\Http\Resources\lists\OrderListResource;
 use App\Models\Orders;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class Api
 {
@@ -17,17 +12,21 @@ class Api
     public function orders(OrderListRequest $request)
     {
         try {
-            // FIXME order_no ile de liste çekilebilecek, order_no alanı gönderilmiyorsa tüm siparişler listelenecek.
-            $data = OrderListResource::collection(
-                Orders::with([
-                    'products',
-                    'customer',
-                    'status',
-                ])
-                ->where('customer_id', $request->get('customer_id') )
-                ->orderBy('id', 'DESC')
-                ->get()
-             );
+
+            $query = Orders::with([
+                'products',
+                'customer',
+                'status',
+            ])
+                ->where('customer_id', $request->get('customer_id'))
+                ->orderBy('id', 'DESC');
+
+            if ($request->has('order_no')) {
+                $query->where('order_no', $request->input('order_no'));
+            }
+
+            $orders = $query->get();
+            $data = OrderListResource::collection($orders);
 
             return response()->json([
                 'orders' => $data->resolve(),
